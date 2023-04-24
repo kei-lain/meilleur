@@ -7,10 +7,10 @@ class CategorySchema(Schema):
     categoryName : str
 
 class GoalSchema(Schema):
+    user : str
     goal : str
     currentDate : datetime.date
     completionDate : datetime.date
-    goalCategory : CategorySchema
 
 class SolutionSchema(Schema):
     goal : str
