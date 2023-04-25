@@ -37,6 +37,26 @@ async def createSolution(goal):
     text = response["choices"][0]["message"]["content"]
     return text
 
+async def createTasks(solution):
+    tasks = []
+    prompt = (f"Giventhe following, create numbered tasks to accomplish this {solution}")
+    message =  [{"role": "user", "content": f"{prompt}"}]
+    try:
+        response = openai.ChatCompletion.create(model="gpt-4",
+                                messages=[
+                                        {"role": "user", "content": prompt}])
+    except:
+        pass
+    text = response["choices"][0]["message"]["content"]
+
+    print(text)
+
+    for task  in text.split('\n'):
+        task.strip()
+        tasks.append(task)
+    return tasks
+        
+
 
 
 

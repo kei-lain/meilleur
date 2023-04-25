@@ -1,5 +1,5 @@
 from ninja import Schema, ModelSchema
-from .models import Goal, Category, Solution
+from .models import Goal, Category, Solution, Task, Journal
 import datetime
 
 
@@ -15,6 +15,16 @@ class GoalSchema(Schema):
 class SolutionSchema(Schema):
     goal : str
     solution : str
-    
+
+class TaskSchema(ModelSchema):
+    class Config:
+        model = Task
+        model_fields = '__all__'
+
 class NotFoundSchema(Schema):
     message: str
+
+class JournalSchema(ModelSchema):
+    class Config:
+        model = Journal
+        model_fields = '__all__'
