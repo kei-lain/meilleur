@@ -54,4 +54,17 @@ async def getAITasks(request, solution_id: int):
         return 201, new_task
 
 
+@api.post("tasks/", response={201: TaskSchema})
+def createTask(request, task: TaskSchema):
+    task = Task.objects.create(**task.dict())
+    return 201, task
+
+@api.get("task/{task_id}", response={201: TaskSchema, 404: NotFoundSchema})
+def getTask(request, task_id: int):
+    try:
+        task = Task.objects.get(pk=task_id)
+        return 200, task
+    except:
+        return 404 , {"message": "goal not found"}
+
 
