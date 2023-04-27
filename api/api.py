@@ -3,7 +3,7 @@ from ninja.responses import codes_2xx
 from django.shortcuts import get_object_or_404
 import asyncio
 from asgiref.sync import sync_to_async
-from .schema import GoalSchema, SolutionSchema, CategorySchema, NotFoundSchema, TaskSchema
+from .schema import GoalSchema, SolutionSchema, CategorySchema, NotFoundSchema, TaskSchema, JournalSchema
 from .models import Goal, Category, Solution, Task, Journal
 import os
 from datetime import datetime
@@ -24,6 +24,19 @@ async def getGoals(request, goal_id: int ):
 def createGoal(request, goal: GoalSchema):
     goal = (Goal.objects.create(**goal.dict()))
     return 201, goal
+
+
+@api.delete("goal/{goal_id}", response={200: None, 404: NotFoundSchema})
+def deleteGoal(request, goal_id: int):
+    try:
+        goal = Goal.objects.get(pk=goal_id)
+        goal.delete()
+        return goal
+    except Goal.DoesNotExist as e:
+        return 404, {"message" : "Could not find goal"}
+
+
+
 
 
 @api.api_operation(["POST","GET"] , "solution/{goal_id}", response={codes_2xx: SolutionSchema, 404: NotFoundSchema})
@@ -66,5 +79,37 @@ def getTask(request, task_id: int):
         return 200, task
     except:
         return 404 , {"message": "goal not found"}
+
+
+@api.put("task/{task_id}", response={200: TaskSchema, 404: NotFoundSchema})
+def changeTask(request, task_id: int, data: TaskSchema):
+    try:
+        task = Task.object.get(pk=task_id)
+        for attribute, value in data.dict().items():
+            setattr(task, attribute, value)
+        task.save()
+        return 200, task
+    except Task.DoesNotExist as e:
+        return 404 , {"message": "Could not find track"}
+
+@api.delete("task/{task_id}", response={200: None, 404: NotFoundSchema})
+def deleteTask(request, task_id: int):
+    try:
+        task = Task.objects.get(pk=task_id)
+        task.delete()
+        return task
+    except Task.DoesNotExist as e:
+        return 404, {"message" : "Could not find track"}
+
+
+@api.post("journal/{journal_id}", response={201: JournalSchema})
+def createJournal(request, journal: JournalSchema):
+    journal = journal.objects.create(**journal.dict())
+    journal.save()
+    return 201, journal
+
+
+
+
 
 
