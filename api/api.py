@@ -109,6 +109,35 @@ def createJournal(request, journal: JournalSchema):
     journal.save()
     return 201, journal
 
+@api.get("journal/{journal_id}", response={200: JournalSchema, 404: NotFoundSchema})
+def getJournal(request, journal_id: int):
+    try:
+        journal = Journal.objects.get(pk=journal_id)
+        return 200, journal
+    except:
+        return 404, {"message": "Journal entry not found"}
+
+@api.put("journal/{journal_id}", response={200: JournalSchema, 404: NotFoundSchema})
+def alterJournal(request, journal_id: int):
+    try:
+        journal = Journal.object.get(pk=journal_id)
+        for attribute, value in data.dict().items():
+            setattr(journal, attribute, value)
+        journal.save()
+        return 200, journal
+    except Journal.DoesNotExist as e:
+        return 404 , {"message": "Could not find journal"}
+
+@api.delete("journal/{journal_id}", response={200: None, 404: NotFoundSchema})
+def deleteCategory(request, journal_id: int):
+    try:
+        journal = Journal.objects.filter(pk=journal_id)
+        journal.delete()
+        return 200, None
+    except:
+        return 404 , {"message": "Journal not found"}
+
+
 @database_sync_to_async
 def get_goal_objects():
     return list(Goal.objects.all())
