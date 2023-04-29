@@ -57,6 +57,28 @@ async def createTasks(solution):
     return tasks
         
 
+async def categorize(thing_list):
+    categories = []
+    prompt= (f"Create categories based on the items in this list: {thing_list}. seperate each category with a line")
+    message =  [{"role": "user", "content": f"{prompt}"}]
+    try:
+        response = openai.ChatCompletion.create(model="gpt-4",
+                                messages=[
+                                        {"role": "user", "content": prompt}])
+    except:
+        pass
+    text = response["choices"][0]["message"]["content"]
+
+    print(text)
+
+    for section in text.split('\n'):
+        section.strip()
+        print(section)
+        categories.append(section)
+    return(categories)
+
+
+
 
 
 

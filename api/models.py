@@ -45,7 +45,7 @@ class Category(models.Model):
     categoryName = models.CharField(max_length=255)
     goalsInCategory = models.ManyToManyField(Goal)
     tasksInCategory = models.ManyToManyField(Task)
-    journalsInCategory = models.ManyToManyField(Journal)
+  
 
 
     def __str__(self):

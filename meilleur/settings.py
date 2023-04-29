@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'daphne',
     'django.contrib.staticfiles',
     'authentication',
     'api',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    
     
 ]
 
@@ -80,6 +82,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'meilleur.wsgi.application'
 
 SITE_ID = 1
+
+ASGI_APPLICATION = "meilleur.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

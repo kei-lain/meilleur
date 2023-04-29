@@ -2,12 +2,13 @@ from ninja import NinjaAPI
 from ninja.responses import codes_2xx
 from django.shortcuts import get_object_or_404
 import asyncio
-from asgiref.sync import sync_to_async
+from asgiref.sync import sync_to_async , async_to_sync
 from .schema import GoalSchema, SolutionSchema, CategorySchema, NotFoundSchema, TaskSchema, JournalSchema
 from .models import Goal, Category, Solution, Task, Journal
 import os
 from datetime import datetime
-from .meilleur import createSolution, createTasks
+from .meilleur import createSolution, createTasks, categorize
+from channels.db import database_sync_to_async
 
 api = NinjaAPI()
 
@@ -102,14 +103,53 @@ def deleteTask(request, task_id: int):
         return 404, {"message" : "Could not find track"}
 
 
-@api.post("journal/{journal_id}", response={201: JournalSchema})
+@api.post("journal/", response={201: JournalSchema})
 def createJournal(request, journal: JournalSchema):
     journal = journal.objects.create(**journal.dict())
     journal.save()
     return 201, journal
 
+@database_sync_to_async
+def get_goal_objects():
+    return list(Goal.objects.all())
 
+@database_sync_to_async
+def get_task_objects():
+    return list(Task.objects.all())
 
+@api.post("category/", response={201: CategorySchema})
+def makeCategories(request, category: CategorySchema):
+    
+    category = Category.objects.create(**category.dict())
+    category.save()
+    return 201, category
 
+@api.get("category/{category_id}", response={200: CategorySchema, 404: NotFoundSchema})
+def getCategory(request, category_id: int):
+    try:
+        category = Category.objects.filter(pk=category_id)
+        return 200, category
+    except: 
+        return 404, {"message": "Category not found"}
+
+@api.put("category/{category_id}", response={200: CategorySchema, 404: NotFoundSchema})
+def alterCategory(request, category_id: int):
+    try:
+        category = Category.object.get(pk=category_id)
+        for attribute, value in data.dict().items():
+            setattr(category, attribute, value)
+        category.save()
+        return 200, category
+    except Category.DoesNotExist as e:
+        return 404 , {"message": "Could not find track"}
+
+@api.delete("category/{category_id}", response={200: None, 404: NotFoundSchema})
+def deleteCategory(request, category_id: int):
+    try:
+        category = Category.objects.filter(pk=category_id)
+        category.delete()
+        return 200, None
+    except:
+        return 404 , {"message": "Category not found"}
 
 
